@@ -176,6 +176,15 @@ class Autocad(object):
         selection.SelectOnScreen()
         return selection
 
+    def create_block(self, insert_pnt, block_name):
+        """Create an empty Block
+
+        :param insert_pnt: Block insert point :class: `APoint`
+        :param block_name: Block's name :class: `str`
+        :returns: Block object :class: `ActiveDocument.ActiveLayout.Block`
+        """
+        return self.doc.Blocks.Add(insert_pnt, block_name)
+
     #: shortcut for :func:`pyautocad.types.aDouble`
     aDouble = staticmethod(pyautocad.types.aDouble)
     #: shortcut for :func:`pyautocad.types.aInt`
