@@ -5,3 +5,6 @@ release
 _build
 dist
 MANIFEST
+
+# ignore lock file
+Pipfile.lock
