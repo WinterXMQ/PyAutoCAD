@@ -33,6 +33,7 @@ except Exception:
 
 import pyautocad.types
 from pyautocad.compat import basestring, xrange
+from pyautocad.entities import *
 
 logger = logging.getLogger(__name__)
 
@@ -184,6 +185,71 @@ class Autocad(object):
         :returns: Block object :class: `ActiveDocument.ActiveLayout.Block`
         """
         return self.doc.Blocks.Add(insert_pnt, block_name)
+
+    def insert_block(self, insert_pnt, block_name, scale_x=1, scale_y=1, scale_z=1, rotation=0, layout=None):
+        """Insert a block reference into layout(Including `Model`)
+
+        :param insert_pnt:Block insert point :class: `APoint`
+        :param block_name: Block's name :class: `str`
+        :param scale_x: X coordination of the block scale rate :class: `double`
+        :param scale_y: Y coordination of the block scale rate :class: `double`
+        :param scale_z: Z coordination of the block scale rate :class: `double`
+        :param rotation: Angle of the block's rotation
+        :param layout: Working layout :class: `str`
+        :returns: True/False, Operation successful or not :class: `bool`
+        """
+        # TODO: [insert_block]Layout need to be improved
+        if layout is None or layout in ('Model', '模型'):
+            self.model.InsertBlock(insert_pnt, block_name, scale_x, scale_y, scale_z, rotation)
+            return True
+        elif layout.startswith('Space'):
+            # layout <= 'Space', 'Space_0', 'Space_name'
+            if layout is 'Space':
+                # TODO: [insert_block]Get Space Layout
+                return False
+            else:
+                if not layout.startswith('Space_'):
+                    return False
+                index_or_name = layout[6:]
+                # TODO: [insert_block]Convert str to int
+                return False
+
+    def add_entities(self, items, doc=None):
+        """Add entities into Model,Space or Block
+
+        :param items: The package of entities :class: `list`, `tuple`
+        :param doc: The document where the entities draw on :class: `ModelSpace` or `PaperSpace` or `Block`
+        :returns: The number of entities draw on :class: `int`
+        """
+        if doc is None:
+            doc = self.model
+        elif doc is str:
+            # TODO: Get PaperSpace by str, like `Space_1` or `Space_name`
+            doc = None
+
+        if doc is None:
+            return 0
+
+        _rs = 0
+        for item in items:
+            if isinstance(item, ALine):
+                self.add_line(item.start, item.end)
+                _rs = _rs + 1
+            # TODO: [add_entities]Add other entity
+
+        return _rs
+
+    def add_line(self, pnt_start, pnt_end, doc=None):
+        """Add 3D line into Model, Space or Block
+
+        :param pnt_start: Start point of line :class: `APoint`
+        :param pnt_end: End point of line :class: `APoint`
+        :param doc: Document, need to be com's object or None :class: `ModelSpace`, `PaperSpace` or `Block`
+        """
+        if doc is None:
+            doc = self.model
+
+        doc.AddLine(pnt_start, pnt_end)
 
     #: shortcut for :func:`pyautocad.types.aDouble`
     aDouble = staticmethod(pyautocad.types.aDouble)
