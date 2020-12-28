@@ -228,16 +228,19 @@ class Autocad(object):
             doc = None
 
         if doc is None:
-            return 0
+            return None
 
         _rs = 0
         for item in items:
             if isinstance(item, ALine):
-                if self.add_line(item.start, item.end) is not None:
-                    _rs = _rs + 1
+                if self.add_line(item.start, item.end, doc) is not None:
+                    _rs += 1
             elif isinstance(item, ACircle):
-                if self.add_circle(item.center, item.radius) is not None:
-                    _rs = _rs + 1
+                if self.add_circle(item.center, item.radius, doc) is not None:
+                    _rs += 1
+            elif isinstance(item, APolyline):
+                if self.add_polyline(item.points, doc) is not None:
+                    _rs += 1
             # TODO: [add_entities]Add other entity
 
         return _rs
@@ -272,6 +275,20 @@ class Autocad(object):
             doc = self.model
 
         return doc.AddCircle(pnt_center, radius)
+
+    def add_polyline(self, polyline, doc=None):
+        """Add polyline into ModelSpace, PaperSpace or Block
+
+        :param polyline: Node list :class: `list[APoint]` or `tuple[APoint]`
+        :param doc: Document, need to be com's object or None :class: `ModelSpace`, `PaperSpace` or `Block`
+        :returns: AutoCAD's Line object or None
+        """
+        if polyline is None:
+            return None
+        if doc is None:
+            doc = self.model
+
+        return doc.AddPolyline(*polyline)
 
     #: shortcut for :func:`pyautocad.types.aDouble`
     aDouble = staticmethod(pyautocad.types.aDouble)
