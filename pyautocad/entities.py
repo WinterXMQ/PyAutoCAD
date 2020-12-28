@@ -34,3 +34,26 @@ class ALine(object):
 
     def __str__(self):
         return 'Aline(%s, %s)' % (self.start, self.end)
+
+
+class ACircle(object):
+    """2D Circle
+
+    """
+
+    def __init__(self, pnt_center, radius):
+        """Circle initial func
+
+        :param pnt_center: Center point of circle :class: `APoint`
+        :param radius: Radius of circle :class: `float`
+        """
+        if pnt_center is None or radius <= 0:
+            raise ValueError('Center point is None or radius is negative')
+        self.center = pnt_center
+        self.radius = radius
+
+    def diameter(self):
+        return self.radius * 2
+
+    def __str__(self):
+        return 'ACircle(Center=%s, radius=%.2f)' % (self.center, self.radius)

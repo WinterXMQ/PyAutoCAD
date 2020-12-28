@@ -233,8 +233,11 @@ class Autocad(object):
         _rs = 0
         for item in items:
             if isinstance(item, ALine):
-                self.add_line(item.start, item.end)
-                _rs = _rs + 1
+                if self.add_line(item.start, item.end) is not None:
+                    _rs = _rs + 1
+            elif isinstance(item, ACircle):
+                if self.add_circle(item.center, item.radius) is not None:
+                    _rs = _rs + 1
             # TODO: [add_entities]Add other entity
 
         return _rs
@@ -245,11 +248,30 @@ class Autocad(object):
         :param pnt_start: Start point of line :class: `APoint`
         :param pnt_end: End point of line :class: `APoint`
         :param doc: Document, need to be com's object or None :class: `ModelSpace`, `PaperSpace` or `Block`
+        :returns: AutoCAD's Line object or None
         """
+        if pnt_start is None or pnt_end is None:
+            return None
+
         if doc is None:
             doc = self.model
 
-        doc.AddLine(pnt_start, pnt_end)
+        return doc.AddLine(pnt_start, pnt_end)
+
+    def add_circle(self, pnt_center, radius, doc=None):
+        """Add 2D Circle into Model, Space or Block
+
+        :param pnt_center: Center point of circle :class: `APoint`
+        :param radius: Radius of circle, radius need be positive :class: `float`
+        :param doc: Document, need to be com's object or None :class: `ModelSpace`, `PaperSpace` or `Block`
+        :returns: AutoCAD's Line object or None
+        """
+        if pnt_center is None or radius <= 0:
+            return None
+        if doc is None:
+            doc = self.model
+
+        return doc.AddCircle(pnt_center, radius)
 
     #: shortcut for :func:`pyautocad.types.aDouble`
     aDouble = staticmethod(pyautocad.types.aDouble)
