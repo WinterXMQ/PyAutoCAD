@@ -12,6 +12,7 @@
 import array
 import operator
 import math
+from decimal import Decimal
 
 from pyautocad.compat import IS_PY3
 
@@ -53,11 +54,11 @@ class APoint(array.array):
         (1.0, 1.0, 1.0)
 
     """
+
     def __new__(cls, x_or_seq, y=0.0, z=0.0):
         if isinstance(x_or_seq, (array.array, list, tuple)) and len(x_or_seq) == 3:
             return super(APoint, cls).__new__(cls, 'd', x_or_seq)
         return super(APoint, cls).__new__(cls, 'd', (x_or_seq, y, z))
-
 
     @property
     def x(self):
@@ -195,3 +196,36 @@ def _sequence_to_comtypes(typecode='d', *sequence):
     if len(sequence) == 1:
         return array.array(typecode, sequence[0])
     return array.array(typecode, sequence)
+
+
+class Vector(object):
+    """Vector with basic geometric operations
+
+    """
+
+    def __init__(self, coordinates):
+        try:
+            if not coordinates:
+                raise ValueError
+            self.coordinates = tuple([Decimal(x) for x in coordinates])
+            self.dimension = len(self.coordinates)
+        except ValueError:
+            raise ValueError('The coordinates must be nonempty')
+        except TypeError:
+            raise TypeError('The coordinates must be an iterable')
+
+    def __str__(self):
+        return 'Vector({})'.format(self.coordinates)
+
+    def __eq__(self, v):
+        return isinstance(v, Vector) and self.coordinates == v.coordinates
+
+    def __add__(self, v):
+        if not isinstance(v, Vector) or v.dimension != self.dimension:
+            raise TypeError('Addition operation between vector requires dimensions')
+        return Vector([x + y for x, y in zip(self.coordinates, v.coordinates)])
+
+    def __sub__(self, v):
+        if not isinstance(v, Vector) or v.dimension != self.dimension:
+            raise TypeError('Subtraction between vector requires dimensions')
+        return Vector([x - y for x, y in zip(self.coordinates, v.coordinates)])
