@@ -3,6 +3,8 @@ pyautoacad - AutoCAD Automation for Python
 
 This library aimed to simplify writing ActiveX_ Automation_ scripts for AutoCAD_ with Python
 
+**Fork from** `reclosedev/pyautocad <https://github.com/reclosedev/pyautocad>`_
+
 Requires:
 ----------
 
