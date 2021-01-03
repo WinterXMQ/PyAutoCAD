@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pyautocad.types import APoint
+from pyautocad.types import APoint, Vector
 
 
 class ALine(object):
@@ -31,6 +31,17 @@ class ALine(object):
     def middle(self):
         """The middle point of 3D line"""
         return APoint((self.start.x + self.end.x) / 2, (self.start.y + self.end.y) / 2, (self.start.z + self.end.z) / 2)
+
+    @staticmethod
+    def create_from_vector(v, pnt):
+        """
+
+        """
+        if v is None or not isinstance(v, Vector) or pnt is None:
+            return None
+        v = v.normalized()
+        # TODO: Change into APoint + Vector
+        return ALine(pnt, [pnt.x + v[0], pnt.y + v[1], pnt.z + v[2]])
 
     def __str__(self):
         return 'Aline(%s, %s)' % (self.start, self.end)

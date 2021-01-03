@@ -13,6 +13,7 @@ import array
 import operator
 import math
 from decimal import Decimal
+from math import sqrt
 
 from pyautocad.compat import IS_PY3
 
@@ -203,7 +204,7 @@ class Vector(object):
 
     """
 
-    def __init__(self, coordinates):
+    def __init__(self, coordinates, error=1e10):
         try:
             if not coordinates:
                 raise ValueError
@@ -214,11 +215,18 @@ class Vector(object):
         except TypeError:
             raise TypeError('The coordinates must be an iterable')
 
+        self.error = error
+
     def __str__(self):
         return 'Vector({})'.format(self.coordinates)
 
     def __eq__(self, v):
-        return isinstance(v, Vector) and self.coordinates == v.coordinates
+        if not isinstance(v, Vector) or v.dimension != self.dimension:
+            return False
+        for x, y in zip(v.coordinates, self.coordinates):
+            if abs(x - y) > self.error:
+                return False
+        return True
 
     def __add__(self, v):
         if not isinstance(v, Vector) or v.dimension != self.dimension:
@@ -229,3 +237,29 @@ class Vector(object):
         if not isinstance(v, Vector) or v.dimension != self.dimension:
             raise TypeError('Subtraction between vector requires dimensions')
         return Vector([x - y for x, y in zip(self.coordinates, v.coordinates)])
+
+    def __mul__(self, v):
+        if not isinstance(v, float) and not isinstance(v, int) and not isinstance(v, Decimal):
+            raise TypeError('Digital number can be support in multiplication of vector')
+        return Vector([x * Decimal(v) for x in self.coordinates])
+
+    def __truediv__(self, v):
+        return self.__mul__(1.0 / v)
+
+    def __getitem__(self, index):
+        return self.coordinates[index]
+
+    def __abs__(self):
+        """Norm of vector
+        """
+        return sqrt(sum([x ** 2 for x in self.coordinates]))
+
+    def magnitude(self):
+        return abs(self)
+
+    def normalized(self):
+        try:
+            _magnitude = abs(self)
+            return self / _magnitude
+        except ZeroDivisionError:
+            return Vector([0, 0, 0])

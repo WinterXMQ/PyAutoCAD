@@ -204,7 +204,7 @@ class Autocad(object):
             return True
         elif layout.startswith('Space'):
             # layout <= 'Space', 'Space_0', 'Space_name'
-            if layout is 'Space':
+            if layout == 'Space':
                 # TODO: [insert_block]Get Space Layout
                 return False
             else:

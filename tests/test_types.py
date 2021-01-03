@@ -5,7 +5,8 @@ import os, sys
 sys.path.insert(0, os.path.abspath('..'))
 import unittest
 
-from pyautocad.types import APoint, distance
+from pyautocad.types import APoint, distance, Vector
+from math import sqrt
 
 
 class PointTestCase(unittest.TestCase):
@@ -78,6 +79,19 @@ class PointTestCase(unittest.TestCase):
         self.assertAlmostEqual(p1.distance_to(p2), 8.660254037844387)
         self.assertEqual(distance(p1, p2), distance(p2, p1))
 
+    def test_vector_add(self):
+        v1 = Vector([1, 2, 3])
+        v2 = Vector([2, 2, 2])
+        self.assertEqual(v1 + v2, Vector([3, 4, 5]))
+
+    def test_vector_magnitude(self):
+        v1 = Vector([1, 2, 3])
+        self.assertEqual(abs(v1), sqrt(1 + 4 + 9))
+
+    def test_vector_normalized(self):
+        v1 = Vector([3, 4, 0])
+        print(v1.normalized(), Vector([0.6, 0.8, 0]))
+        self.assertEqual(v1.normalized(), Vector([0.6, 0.8, 0]))
 
 if __name__ == '__main__':
     unittest.main()
