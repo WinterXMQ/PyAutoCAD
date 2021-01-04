@@ -41,11 +41,11 @@ class APoint(array.array):
         >>> p = APoint(10, 10)
         >>> p + p
         APoint(20.00, 20.00, 0.00)
-        >>> p + 10
+        >>> p + [10, 10, 10]
         APoint(20.00, 20.00, 10.00)
         >>> p * 2
         APoint(20.00, 20.00, 0.00)
-        >>> p -= 1
+        >>> p -= [1, 1, 1]
         >>> p
         APoint(9.00, 9.00, -1.00)
 
@@ -57,9 +57,15 @@ class APoint(array.array):
     """
 
     def __new__(cls, x_or_seq, y=0.0, z=0.0):
-        if isinstance(x_or_seq, (array.array, list, tuple)) and len(x_or_seq) == 3:
-            return super(APoint, cls).__new__(cls, 'd', x_or_seq)
-        return super(APoint, cls).__new__(cls, 'd', (x_or_seq, y, z))
+        return super(APoint, cls).__new__(cls, 'd', x_or_seq) if APoint.type_check(x_or_seq)\
+            else super(APoint, cls).__new__(cls, 'd', (x_or_seq, y, z))
+
+    @staticmethod
+    def type_check(t):
+        """ Check the type of data is identified to APoint
+        :return: bool
+        """
+        return isinstance(t, (array.array, list, tuple)) and len(t) == 3
 
     @property
     def x(self):
@@ -96,29 +102,36 @@ class APoint(array.array):
         return distance(self, other)
 
     def __add__(self, other):
-        return self.__left_op(self, other, operator.add)
+        if APoint.type_check(other):
+            return self.__left_op(self, other, operator.add)
+        return NotImplemented
 
     def __sub__(self, other):
-        return self.__left_op(self, other, operator.sub)
+        if APoint.type_check(other):
+            return self.__left_op(self, other, operator.sub)
+        return NotImplemented
 
     def __mul__(self, other):
-        return self.__left_op(self, other, operator.mul)
+        if isinstance(other, (int, float)):
+            return self.__left_op(self, other, operator.mul)
+        return NotImplemented
 
     if IS_PY3:
         def __div__(self, other):
-            return self.__left_op(self, other, operator.truediv)
+            if isinstance(other, (int, float)):
+                return self.__left_op(self, other, operator.truediv)
+            return NotImplemented
     else:
         def __div__(self, other):
-            return self.__left_op(self, other, operator.div)
+            if isinstance(other, (int, float)):
+                return self.__left_op(self, other, operator.div)
+            return NotImplemented
 
     __radd__ = __add__
     __rsub__ = __sub__
     __rmul__ = __mul__
-    __rdiv__ = __div__
     __floordiv__ = __div__
-    __rfloordiv__ = __div__
     __truediv__ = __div__
-    _r_truediv__ = __div__
 
     def __neg__(self):
         return self.__left_op(self, -1, operator.mul)
@@ -129,16 +142,24 @@ class APoint(array.array):
         return APoint(op(p1[0], p2[0]), op(p1[1], p2[1]), op(p1[2], p2[2]))
 
     def __iadd__(self, p2):
-        return self.__iop(p2, operator.add)
+        if APoint.type_check(p2):
+            return self.__iop(p2, operator.add)
+        return NotImplemented
 
     def __isub__(self, p2):
-        return self.__iop(p2, operator.sub)
+        if APoint.type_check(p2):
+            return self.__iop(p2, operator.sub)
+        return NotImplemented
 
     def __imul__(self, p2):
-        return self.__iop(p2, operator.mul)
+        if isinstance(p2, (float, int)):
+            return self.__iop(p2, operator.mul)
+        return NotImplemented
 
     def __idiv__(self, p2):
-        return self.__iop(p2, operator.div)
+        if isinstance(p2, (float, int)):
+            return self.__iop(p2, operator.div)
+        return NotImplemented
 
     def __iop(self, p2, op):
         if isinstance(p2, (float, int)):

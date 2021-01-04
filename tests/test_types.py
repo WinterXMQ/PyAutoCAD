@@ -18,11 +18,8 @@ class PointTestCase(unittest.TestCase):
 
         self.assertEqual(p1 + p2, (2, 2, 2))
         self.assertEqual(p1 - p3, (-1, -1, -1))
-        self.assertEqual(p1 * p2, p1)
-        self.assertEqual(p3 * p4, (4, 4, 4))
-        self.assertEqual(p3 / p4, p1)
 
-        self.assertEqual(p1 + 1, (2, 2, 2))
+        self.assertEqual(p1 + [1, 1, 1], (2, 2, 2))
         self.assertEqual(p2 * 4, p3 * 2)
         self.assertEqual(p3 * 10, (20, 20, 20))
         self.assertEqual(p3 / 2, p1)
@@ -35,14 +32,14 @@ class PointTestCase(unittest.TestCase):
         p2 = APoint(2, 2, 2)
         p3 = APoint(3, 3, 3)
 
-        p1 += 2
+        p1 += [2, 2, 2]
         p2 += p3
         self.assertEqual(p1, p3)
         self.assertEqual(p2, (5, 5, 5))
 
         p1 = APoint(1, 1, 1)
         p2 = APoint(2, 2, 2)
-        p1 -= 2
+        p1 -= [2, 2, 2]
         p2 -= p3
         self.assertEqual(p1, (-1, -1, -1))
         self.assertEqual(p2, (-1, -1, -1))
@@ -90,8 +87,13 @@ class PointTestCase(unittest.TestCase):
 
     def test_vector_normalized(self):
         v1 = Vector([3, 4, 0])
-        print(v1.normalized(), Vector([0.6, 0.8, 0]))
         self.assertEqual(v1.normalized(), Vector([0.6, 0.8, 0]))
+
+    def test_point_operator(self):
+        p1 = APoint(1, 2, 2)
+        p2 = [1, 0, 0] + p1
+        self.assertEqual(p2, [2, 2, 2])
+
 
 if __name__ == '__main__':
     unittest.main()
