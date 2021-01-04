@@ -250,19 +250,23 @@ class Vector(object):
         return True
 
     def __add__(self, v):
-        if not isinstance(v, Vector) or v.dimension != self.dimension:
-            raise TypeError('Addition operation between vector requires dimensions')
-        return Vector([x + y for x, y in zip(self.coordinates, v.coordinates)])
+        if isinstance(v, Vector) and v.dimension == self.dimension:
+            return Vector([x + y for x, y in zip(self.coordinates, v.coordinates)])
+        if isinstance(v, (array.array, list, tuple)) and len(v) == self.dimension:
+            return Vector([x + y for x, y in zip(self.coordinates, v)])
+        return NotImplemented
 
     def __sub__(self, v):
-        if not isinstance(v, Vector) or v.dimension != self.dimension:
-            raise TypeError('Subtraction between vector requires dimensions')
-        return Vector([x - y for x, y in zip(self.coordinates, v.coordinates)])
+        if isinstance(v, Vector) and v.dimension == self.dimension:
+            return Vector([x - y for x, y in zip(self.coordinates, v.coordinates)])
+        if isinstance(v, (array.array, list, tuple)) and len(v) == self.dimension:
+            return Vector([x - y for x, y in zip(self.coordinates, v)])
+        return NotImplemented
 
     def __mul__(self, v):
-        if not isinstance(v, float) and not isinstance(v, int) and not isinstance(v, Decimal):
-            raise TypeError('Digital number can be support in multiplication of vector')
-        return Vector([x * Decimal(v) for x in self.coordinates])
+        if isinstance(v, (float, int)):
+            return Vector([x * Decimal(v) for x in self.coordinates])
+        return NotImplemented
 
     def __truediv__(self, v):
         return self.__mul__(1.0 / v)
@@ -274,6 +278,10 @@ class Vector(object):
         """Norm of vector
         """
         return sqrt(sum([x ** 2 for x in self.coordinates]))
+
+    __radd__ = __add__
+    __rsub__ = __sub__
+    __rmul__ = __mul__
 
     def magnitude(self):
         return abs(self)
