@@ -5,7 +5,7 @@ import os, sys
 sys.path.insert(0, os.path.abspath('..'))
 import unittest
 
-from pyautocad.types import APoint, distance, Vector
+from pyautocad.types import APoint, distance, Vector, Vector3D
 from math import sqrt
 
 
@@ -98,6 +98,16 @@ class PointTestCase(unittest.TestCase):
         p1 = APoint(1, 2, 1)
         v1 = Vector([1, 0, 0])
         self.assertEqual(p1 + v1, [2, 2, 1])
+
+    def test_vector3d(self):
+        v3d1 = Vector3D(1, 2, 3)
+        self.assertEqual(v3d1, Vector([1, 2, 3]))
+
+        self.assertEqual(v3d1 + [1, 0, 0], Vector([2, 2, 3]))
+        self.assertEqual(v3d1 - Vector([1, 0, 0]), Vector([0, 2, 3]))
+        self.assertEqual(v3d1 / 2, Vector3D(0.5, 1, 1.5))
+        self.assertEqual(v3d1.dot([1, 2, 0]), 5)
+        self.assertEqual(Vector3D(1, 0, 0).cross([0, 1, 0]), [0, 0, 1])
 
 
 if __name__ == '__main__':

@@ -224,7 +224,7 @@ class Vector(object):
 
     """
 
-    def __init__(self, coordinates, error=1e10):
+    def __init__(self, coordinates, error=1e-15):
         try:
             if not coordinates:
                 raise ValueError
@@ -241,9 +241,13 @@ class Vector(object):
         return 'Vector({})'.format(self.coordinates)
 
     def __eq__(self, v):
-        if not isinstance(v, Vector) or v.dimension != self.dimension:
+        if isinstance(v, Vector) and v.dimension == self.dimension:
+            d = v.coordinates
+        elif isinstance(v, (array.array, list, tuple)) and len(v) == self.dimension:
+            d = v
+        else:
             return False
-        for x, y in zip(v.coordinates, self.coordinates):
+        for x, y in zip(d, self.coordinates):
             if abs(x - y) > self.error:
                 return False
         return True
@@ -291,3 +295,60 @@ class Vector(object):
             return self / _magnitude
         except ZeroDivisionError:
             return Vector([0, 0, 0])
+
+
+class Vector3D(Vector):
+    """3 dimensions of Vector, support dot operation and cross operation
+    """
+    def __init__(self, x_or_list, y=0, z=0, error=1e-15):
+        if isinstance(x_or_list, (int, float)):
+            super(Vector3D, self).__init__([x_or_list, y, z], error)
+        elif isinstance(x_or_list, (array.array, tuple, list)) and len(x_or_list) == 3:
+            super(Vector3D, self).__init__(x_or_list, error)
+        else:
+            raise ValueError('Received an unacceptable data type: %s' % type(x_or_list).__name__)
+
+    def dot(self, v):
+        if isinstance(v, Vector3D) or (isinstance(v, Vector) and v.dimension == 3):
+            return sum([x * y for x, y in zip(self.coordinates, v.coordinates)])
+        elif isinstance(v, (array.array, tuple, list)) and len(v) == 3:
+            return sum([x * y for x, y in zip(self.coordinates, v)])
+        else:
+            return 0
+
+    def cross(self, v):
+        try:
+            x1, y1, z1 = self.coordinates
+            if isinstance(v, Vector):
+                x2, y2, z2 = v.coordinates
+            elif isinstance(v, (array.array, list, tuple)):
+                x2, y2, z2 = v
+            else:
+                raise ValueError('Unsupported data')
+            return Vector3D(y1 * z2 - y2 * z1, -(x1 * z2 - x2 * z1), x1 * y2 - x2 * y1)
+        except ValueError:
+            return None
+
+    @property
+    def x(self):
+        return self.coordinates[0]
+
+    @property
+    def y(self):
+        return self.coordinates[1]
+
+    @property
+    def z(self):
+        return self.coordinates[2]
+
+    @x.setter
+    def x(self, v):
+        self[0] = v
+
+    @y.setter
+    def y(self, v):
+        self[1] = v
+
+    @z.setter
+    def z(self, v):
+        self[2] = v
