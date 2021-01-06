@@ -94,6 +94,11 @@ class PointTestCase(unittest.TestCase):
         p2 = [1, 0, 0] + p1
         self.assertEqual(p2, [2, 2, 2])
 
+    def test_vector_point_operator(self):
+        p1 = APoint(1, 2, 1)
+        v1 = Vector([1, 0, 0])
+        self.assertEqual(p1 + v1, [2, 2, 1])
+
 
 if __name__ == '__main__':
     unittest.main()

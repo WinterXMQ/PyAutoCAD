@@ -12,7 +12,6 @@
 import array
 import operator
 import math
-from decimal import Decimal
 from math import sqrt
 
 from pyautocad.compat import IS_PY3
@@ -102,12 +101,12 @@ class APoint(array.array):
         return distance(self, other)
 
     def __add__(self, other):
-        if APoint.type_check(other):
+        if APoint.type_check(other) or (isinstance(other, Vector) and other.dimension == 3):
             return self.__left_op(self, other, operator.add)
         return NotImplemented
 
     def __sub__(self, other):
-        if APoint.type_check(other):
+        if APoint.type_check(other) or (isinstance(other, Vector) and other.dimension == 3):
             return self.__left_op(self, other, operator.sub)
         return NotImplemented
 
@@ -229,7 +228,7 @@ class Vector(object):
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple([Decimal(x) for x in coordinates])
+            self.coordinates = tuple([float(x) for x in coordinates])
             self.dimension = len(self.coordinates)
         except ValueError:
             raise ValueError('The coordinates must be nonempty')
@@ -265,7 +264,7 @@ class Vector(object):
 
     def __mul__(self, v):
         if isinstance(v, (float, int)):
-            return Vector([x * Decimal(v) for x in self.coordinates])
+            return Vector([x * v for x in self.coordinates])
         return NotImplemented
 
     def __truediv__(self, v):

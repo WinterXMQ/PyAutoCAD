@@ -41,10 +41,13 @@ class ALine(object):
             return None
         v = v.normalized()
         # TODO: Change into APoint + Vector
-        return ALine(pnt, [pnt.x + v[0], pnt.y + v[1], pnt.z + v[2]])
+        return ALine(pnt, pnt + v)
 
     def __str__(self):
         return 'Aline(%s, %s)' % (self.start, self.end)
+
+    def __eq__(self, v):
+        return isinstance(v, ALine) and self.start == v.start and self.end == v.end
 
 
 class ACircle(object):
